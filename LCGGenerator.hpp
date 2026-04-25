@@ -21,7 +21,7 @@ public:
     
     uint64_t next() override {
         // X_{n+1} = (a * X_n + c) mod m
-        state = (m * state + c) % m;
+        state = (a * state + c) % m;
         return state;
     }
     
