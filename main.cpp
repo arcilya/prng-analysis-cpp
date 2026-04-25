@@ -5,10 +5,10 @@
 #include <random>
 
 #include "LCGGenerator.hpp"
-#include "util/generateData.hpp"
+#include "util/generateDataTable.hpp"
 
 int main() {
     LinearCongruentialGenerator lcg(7); 
-    generateData(lcg, "data.csv", 5000, 6075);
+    generateDataTable(lcg, "data.csv", 5000, 6075);
     return 0;
 }

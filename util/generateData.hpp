@@ -4,7 +4,7 @@
 
 #include "../IGenerator.hpp"
 
-void generateData(IGenerator& gen, const std::string& filename, size_t count, uint64_t m) {
+void generateDataTable(IGenerator& gen, const std::string& filename, size_t count, uint64_t m) {
     std::ofstream outFile(filename);
     outFile << "x,y\n";
 
