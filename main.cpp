@@ -81,7 +81,7 @@ int main() {
     std::cout << "\nВыберите действие:" << std::endl;
     std::cout << "1. Генерация файла данных (для внешних тестов NIST/Dieharder)" << std::endl;
     std::cout << "2. Эксперимент: Вычисление числа Пи (Монте-Карло)" << std::endl;
-    std::cout << "3. Эксперимент: Модель Блэка-Шоулза (в разработке)" << std::endl;
+    std::cout << "3. Эксперимент: Модель Блэка-Шоулза" << std::endl;
     std::cout << ">> ";
     int actionChoice;
     std::cin >> actionChoice;
@@ -140,7 +140,11 @@ int main() {
         Experiments::runPiExperiment(*gen, piIters);
     }
     else if (actionChoice == 3) {
-        std::cout << "\n[!] Модель Блэка-Шоулза будет добавлена далее" << std::endl;
+        uint64_t bsIters;
+        std::cout << "\n[Блэк-Шоулз] Введите кол-во траекторий (рекомендуется 10 000 000): ";
+        std::cin >> bsIters;
+        
+        Experiments::runBlackScholesExperiment(*gen, bsIters);
     }
 
     std::cout << "\n========================================================" << std::endl;
