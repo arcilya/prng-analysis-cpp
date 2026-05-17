@@ -9,28 +9,33 @@
  */
 class LinearCongruentialGenerator : public IGenerator {
 private:
-    uint64_t state; 
+    uint32_t state; 
     
     // параметры LCG (константы)
-    static constexpr uint64_t a = 1103515245;   // a
-    static constexpr uint64_t c = 12345;          // c
-    static constexpr uint64_t m = 2147483648;       // m = 2^31
+    static constexpr uint32_t a = 1664525;   // a
+    static constexpr uint32_t c = 1013904223;          // c
+    // m = 2 ** 32, но он не нужен, т.к. используем переполнение uint32_t
     
 public:
-    explicit LinearCongruentialGenerator(uint64_t seed = 1) : state(seed) {}
+    explicit LinearCongruentialGenerator(uint32_t seed = 1) : state(seed) {}
     
     uint64_t next() override {
         // X_{n+1} = (a * X_n + c) mod m
-        state = (a * state + c) % m;
-        return state;
+        state = (a * state + c) % 2147483647;
+        return static_cast<uint64_t>(state);
     }
     
     void setSeed(uint64_t seed) override {
-        state = seed;
+        state = static_cast<uint32_t>(seed);
     }
     
     const char* getName() const override {
         return "Linear Congruential Generator (LCG)";
+    }
+
+     double nextDouble() {
+        // Деление на 2^32 для получения числа от 0 до 1
+        return static_cast<double>(next()) / 4294967296.0;
     }
 };
 

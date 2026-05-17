@@ -85,6 +85,10 @@ public:
     const char* getName() const override {
         return "XorShift (Marsaglia)";
     }
+
+    double nextDouble() {
+        return static_cast<double>(next()) / 4294967296.0;
+    }
 };
 
 #endif 

@@ -1,5 +1,5 @@
-#ifndef XORSHIFT_PLUS_HPP
-#define XORSHIFT_PLUS_HPP
+#ifndef XORSHIFT_STAR_HPP
+#define XORSHIFT_STAR_HPP
 
 #include "IGenerator.hpp"
 

@@ -9,7 +9,9 @@ void generateDataBinary(IGenerator& gen, const std::string& filename, size_t cou
 
     for (size_t i = 0; i < count; ++i) {
         uint64_t value = gen.next();
-        outFile.write(reinterpret_cast<const char*>(&value), sizeof(uint64_t));
+        
+        uint32_t val = static_cast<uint32_t>(gen.next());
+        outFile.write(reinterpret_cast<const char*>(&val), sizeof(val));
     }
 
     outFile.close();
