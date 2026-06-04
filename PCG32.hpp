@@ -1,7 +1,7 @@
 #ifndef PCG32_HPP
 #define PCG32_HPP
 
-#include "Generator.hpp"
+#include "IGenerator.hpp"
 #include <cstdint>
 
 class PCG32 : public IGenerator {

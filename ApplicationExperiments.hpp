@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iomanip>
 #include <algorithm> 
-#include "Generator.hpp"
+#include "IGenerator.hpp"
 
 namespace Experiments {
     const double PI_REF = 3.14159265358979323846;

@@ -27,10 +27,22 @@ public:
     // Название генератора
     virtual const char* getName() const = 0;
 
-    using result_type = uint32_t;
-    static constexpr uint32_t min() { return 0; }
-    static constexpr uint32_t max() { return 0xFFFFFFFF; } // 32 бита (8 девяток в HEX)
-    uint32_t operator()() { return static_cast<uint32_t>(next()); }
+    // --- ЭТОТ БЛОК НЕОБХОДИМ ДЛЯ СОВМЕСТИМОСТИ С STL И КОДОМ КОЛЛЕГИ ---
+    // Переводим интерфейс на честные 64-бита, чтобы std::poisson_distribution не ругался
+    using result_type = uint64_t;
+    
+    static constexpr uint64_t min() { 
+        return 0; 
+    }
+    
+    static constexpr uint64_t max() { 
+        return 0xFFFFFFFFFFFFFFFFULL; // 64 бита (максимальное значение)
+    }
+    
+    uint64_t operator()() { 
+        return next(); 
+    }
+    // ------------------------------------------------------------------
 };
 
 #endif

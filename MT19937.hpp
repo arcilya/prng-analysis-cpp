@@ -1,7 +1,7 @@
 #ifndef MT19937_HPP
 #define MT19937_HPP
 
-#include "Generator.hpp"
+#include "IGenerator.hpp"
 #include <cstdint>
 
 class MT19937 : public IGenerator {
