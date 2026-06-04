@@ -16,7 +16,7 @@
 #include "XorshiftPlusGenerator.hpp"
 #include "XorshiftStarGenerator.hpp"
 #include "util/generateDataBinary.hpp"
-#include "../exprtk.hpp"
+#include "exprtk.hpp"
 #include "MonteCarloGenerator.hpp"
 #include "StdGenerator.hpp"
 
