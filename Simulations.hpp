@@ -18,12 +18,8 @@
 #include "StdGenerator.hpp"
 #include "exprtk.hpp"
 
-void runIntegrationSimulation(IGenerator& gen, int N_runs, double a, double b) {
+void runIntegrationSimulation(IGenerator& gen, int N_runs, double a, double b, const std::string& expression_string) {
     auto start = std::chrono::high_resolution_clock::now();
-
-    std::string expression_string;
-    std::cout << "Введите математическую функцию (например, sin(x)): ";
-    std::getline(std::cin, expression_string);
 
     double x;
     exprtk::symbol_table<double> symbol_table;
