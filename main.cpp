@@ -214,7 +214,7 @@ int main() {
         // случайные блуждания
         else if (actionChoice == 4) {
             int T_coin, N_runs;
-            std::cout << "Введите количество шагов T (например, 10): "; std::cin >> T_coin;
+            std::cout << "Введите границу T (например, 10): "; std::cin >> T_coin;
             std::cout << "Введите количество итераций (N): "; std::cin >> N_runs;
             
             std::cout << "\n--- [МЕНЕДЖЕР ТЕСТОВ: СЛУЧАЙНЫЕ БЛУЖДАНИЯ COIN WALK] ---\n";
