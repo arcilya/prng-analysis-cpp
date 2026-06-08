@@ -20,7 +20,10 @@
 
 void runIntegrationSimulation(IGenerator& gen, int N_runs, double a, double b) {
     auto start = std::chrono::high_resolution_clock::now();
-    std::string expression_string = "sin(x)";
+
+    std::string expression_string;
+    std::cout << "Введите математическую функцию (например, sin(x)): ";
+    std::getline(std::cin, expression_string);
 
     double x;
     exprtk::symbol_table<double> symbol_table;

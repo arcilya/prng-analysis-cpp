@@ -27,8 +27,7 @@ public:
     // Название генератора
     virtual const char* getName() const = 0;
 
-    // --- ЭТОТ БЛОК НЕОБХОДИМ ДЛЯ СОВМЕСТИМОСТИ С STL И КОДОМ КОЛЛЕГИ ---
-    // Переводим интерфейс на честные 64-бита, чтобы std::poisson_distribution не ругался
+    // --- ЭТОТ БЛОК НЕОБХОДИМ ДЛЯ СОВМЕСТИМОСТИ С STL---
     using result_type = uint64_t;
     
     static constexpr uint64_t min() { 

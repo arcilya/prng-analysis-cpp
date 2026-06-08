@@ -16,7 +16,6 @@
 
 #include "Simulations.hpp"
 
-// Ваша обертка для стандартного STL вихря
 class StdMT19937 : public IGenerator {
 private:
     std::mt19937 engine;
@@ -36,7 +35,6 @@ public:
     double nextDouble() override { return dist(engine); }
 };
 
-// Ваша функция записи в бинарный файл
 void generateFile(IGenerator& gen, const std::string& filename, uint64_t count, bool asDouble) {
     std::ofstream ofs(filename, std::ios::binary);
     if (!ofs.is_open()) {
@@ -63,11 +61,10 @@ void generateFile(IGenerator& gen, const std::string& filename, uint64_t count, 
               << (count / diff.count()) / 1e6 << " млн/сек\n----------------------------------------" << std::endl;
 }
 
-// Единая фабрика: собирает ВСЕ 9 генераторов вашей команды
+// единая фабрика
 std::vector<std::unique_ptr<IGenerator>> getAllGenerators(uint64_t seed) {
     std::vector<std::unique_ptr<IGenerator>> generators;
     
-    // 6 Генераторов коллеги
     generators.push_back(std::make_unique<StdRandGenerator>(seed));
     generators.push_back(std::make_unique<LinearCongruentialGenerator>(seed));
     generators.push_back(std::make_unique<Xorshift64Generator>(seed));
@@ -75,7 +72,6 @@ std::vector<std::unique_ptr<IGenerator>> getAllGenerators(uint64_t seed) {
     generators.push_back(std::make_unique<XorShift128Plus>(seed));
     generators.push_back(std::make_unique<XorShift128Star>(seed));
     
-    // 3 Ваших генератора
     auto pcg = std::make_unique<PCG32>(); pcg->setSeed(seed); generators.push_back(std::move(pcg));
     auto mt = std::make_unique<MT19937>(); mt->setSeed(seed); generators.push_back(std::move(mt));
     auto std_mt = std::make_unique<StdMT19937>(); std_mt->setSeed(seed); generators.push_back(std::move(std_mt));
@@ -90,22 +86,17 @@ int main() {
     uint64_t seed = 1234567;
     int actionChoice = -1;
 
-    // Дефолтные параметры для симуляций коллеги
-    double lambda = 2.0;
-    double T_pois = 10.0;
-    int T_coin = 10;
-    double a = 0.0;
-    double b = M_PI;
-
     while (true) {
         std::cout << "====================================================================\n";
         std::cout << "  ПРОГРАММНЫЙ КОМПЛЕКС КУРСОВОГО ПРОЕКТА: BENCHMARK SUITE ГПСЧ\n";
         std::cout << "====================================================================\n\n";
-        std::cout << "Выберите категорию тестов:\n";
-        std::cout << "1. ЭМПИРИЧЕСКИЙ АНАЛИЗ (Генерация сырых .bin файлов для NIST/TestU01)\n";
-        std::cout << "2. ГЕОМЕТРИЧЕСКИЙ МОНТЕ-КАРЛО (Вычисление Пи + Интегрирование sin(x))\n";
-        std::cout << "3. ДИСКРЕТНЫЕ СТОХАСТИЧЕСКИЕ ПРОЦЕССЫ (Процесс Пуассона + Блуждания Coin Walk)\n";
-        std::cout << "4. ФИНАНСОВОЕ МОДЕЛИРОВАНИЕ (Оценка стоимости по модели Блэка-Шоулза)\n";
+        std::cout << "Выберите тест или действие:\n";
+        std::cout << "1. Эмпирический анализ (генерация сырых .bin файлов)\n";
+        std::cout << "2. Вычисление числа Пи (Монте-Карло)\n";
+        std::cout << "3. Интегрирование функции (Монте-Карло)\n";
+        std::cout << "4. Процесс Пуассона (блуждания)\n";
+        std::cout << "5. Случайные блуждания (дискретные симметричные)\n";
+        std::cout << "6. Оценка стоимости опционов по модели Блэка-Шоулза\n";
         std::cout << "0. Выход\n";
         std::cout << ">> ";
         std::cin >> actionChoice;
@@ -115,54 +106,91 @@ int main() {
             break;
         }
 
-        if (actionChoice < 1 || actionChoice > 4) {
+        if (actionChoice < 1 || actionChoice > 6) {
             std::cout << "Неверный выбор! Попробуйте снова." << std::endl;
             continue;
         }
 
-        // Генерируем чистый пул генераторов для выбранного эксперимента
         auto generators = getAllGenerators(seed);
 
+        // генерация файлов (с выбором конкретного генератора)
         if (actionChoice == 1) {
+            std::cout << "\n--- ДОСТУПНЫЕ ГЕНЕРАТОРЫ ---\n";
+            for (size_t i = 0; i < generators.size(); ++i) {
+                std::cout << i + 1 << ". " << generators[i]->getName() << "\n";
+            }
+            std::cout << "0. Сгенерировать для всех генераторов\n";
+            std::cout << ">> Выберите генератор: ";
+            int genChoice; std::cin >> genChoice;
+
             std::cout << "\n[Формат данных]\n1. Целые числа (uint32) - для Dieharder/NIST\n2. Дробные числа (double) - для TestU01\n>> ";
             int typeChoice; std::cin >> typeChoice;
             uint64_t count; std::cout << "Введите количество чисел (например, 20000000): "; std::cin >> count;
             
-            std::cout << "\n--- СЕРИЙНЫЙ ЭКСПОРТ ДАННЫХ В ФАЙЛЫ ---\n";
-            for (const auto& g : generators) {
+            std::cout << "\n--- ЭКСПОРТ ДАННЫХ В ФАЙЛЫ ---\n";
+            
+            if (genChoice == 0) {
+                for (const auto& g : generators) {
+                    std::string fname = std::string(g->getName()) + "_data.bin";
+                    fname.erase(std::remove(fname.begin(), fname.end(), ' '), fname.end());
+                    generateFile(*g, fname, count, (typeChoice == 2));
+                }
+            } else if (genChoice > 0 && genChoice <= static_cast<int>(generators.size())) {
+                auto& g = generators[genChoice - 1];
                 std::string fname = std::string(g->getName()) + "_data.bin";
-                // Удаляем пробелы из имен файлов, чтобы ОС не ругалась
                 fname.erase(std::remove(fname.begin(), fname.end(), ' '), fname.end());
                 generateFile(*g, fname, count, (typeChoice == 2));
+            } else {
+                std::cout << "Ошибка: Неверно указан номер генератора.\n";
             }
         } 
+        // вычисление Пи
         else if (actionChoice == 2) {
             int N_runs; std::cout << "Введите количество итераций (N) [рекомендуется 10000000]: "; std::cin >> N_runs;
-            
             std::cout << "\n--- [МЕНЕДЖЕР ТЕСТОВ: ВЫЧИСЛЕНИЕ ЧИСЛА ПИ] ---\n";
             for (const auto& g : generators) {
                 Experiments::runPiExperiment(*g, N_runs);
             }
-
-            std::cout << "\n--- [МЕНЕДЖЕР ТЕСТОВ: ИНТЕГРИРОВАНИЕ sin(x)] ---\n";
+        } 
+        // интегрирование
+        else if (actionChoice == 3) {
+            double a, b;
+            int N_runs;
+            std::cout << "Введите нижний предел интегрирования (a), например 0.0: "; std::cin >> a;
+            std::cout << "Введите верхний предел интегрирования (b), например 3.14159: "; std::cin >> b;
+            std::cout << "Введите количество итераций (N) [рекомендуется 10000000]: "; std::cin >> N_runs;
+            
+            std::cout << "\n--- [МЕНЕДЖЕР ТЕСТОВ: ИНТЕГРИРОВАНИЕ] ---\n";
             for (const auto& g : generators) {
                 runIntegrationSimulation(*g, N_runs, a, b);
             }
         } 
-        else if (actionChoice == 3) {
-            int N_runs; std::cout << "Введите количество итераций (N): "; std::cin >> N_runs;
+        // процесс Пуассона 
+        else if (actionChoice == 4) {
+            double lambda, T_pois;
+            int N_runs;
+            std::cout << "Введите lambda (например, 2.0): "; std::cin >> lambda;
+            std::cout << "Введите T (поглощащую границу) (например, 10.0): "; std::cin >> T_pois;
+            std::cout << "Введите количество итераций (N): "; std::cin >> N_runs;
             
             std::cout << "\n--- [МЕНЕДЖЕР ТЕСТОВ: МОДЕЛЬ ПУАССОНА] ---\n";
             for (const auto& g : generators) {
                 runPoissonSimulation(*g, N_runs, lambda, T_pois);
             }
-
+        } 
+        // блуждания
+        else if (actionChoice == 5) {
+            int T_coin, N_runs;
+            std::cout << "Введите T (поглощающую границу) (например, 10): "; std::cin >> T_coin;
+            std::cout << "Введите количество итераций (N): "; std::cin >> N_runs;
+            
             std::cout << "\n--- [МЕНЕДЖЕР ТЕСТОВ: СЛУЧАЙНЫЕ БЛУЖДАНИЯ COIN WALK] ---\n";
             for (const auto& g : generators) {
                 runCoinSimulation(*g, N_runs, T_coin);
             }
         } 
-        else if (actionChoice == 4) {
+        // Блэк-Шоулз
+        else if (actionChoice == 6) {
             uint64_t bsIters; std::cout << "Введите количество траекторий (рекомендуется 10000000): "; std::cin >> bsIters;
             
             std::cout << "\n--- [МЕНЕДЖЕР ТЕСТОВ: МОДЕЛЬ БЛЭКА-ШОУЛЗА] ---\n";
@@ -171,9 +199,9 @@ int main() {
             }
         }
 
-        std::cout << "\nТестирование группы алгоритмов успешно завершено.\n";
+        std::cout << "\nВыполнение завершено.\n";
         system("pause");
-        system("cls"); // Очистка консоли для красоты интерфейса
+        system("cls"); 
     }
 
     return 0;

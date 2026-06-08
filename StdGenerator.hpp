@@ -15,7 +15,6 @@ public:
     }
 
     double nextDouble() override {
-        // Деление на 2^64 для получения числа от 0 до 1
         return static_cast<double>(next()) / 4294967296.0;
     }
 
